@@ -1,0 +1,18 @@
+[project]
+name = "emotion-chatbot"
+version = "0.1.0"
+description = "Emotion-Aware Chatbot using Transformer and Sentiment Conditioning"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "torch",
+    "transformers",
+    "datasets",
+    "scikit-learn",
+    "numpy",
+    "accelerate",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
