@@ -1,21 +1,146 @@
-Emotion-Aware Chatbot using Transformer and Sentiment Conditioning
- 
-Problem Statement and Motivation: Many chatbots today give normal replies without understanding the user’s feelings. For example, if a user says they are sad or stressed, the chatbot may still reply in a general way without showing care. This makes conversation less helpful and not natural. In this project, I want to build a chatbot that can first understand the emotion in the user’s message and then give a reply based on that emotion. This will make the chatbot more useful and closer to real human conversation.
-Task Description: This project has two main parts. First, the system will take a user’s message and identify the emotion, such as happy, sad, angry, or neutral. Second, the system will generate a reply using both the user’s message and the detected emotion. The final output will be a response that matches the user’s feeling.
-Why This Problem Matters: Emotions are an important part of communication. If a chatbot understands emotions, it can give better and more meaningful replies. This is useful in real-world situations like support systems, learning tools, and simple help applications. This project shows how deep learning can improve user experience by making systems more aware of human feelings (Devlin et al., 2019).
-Data: For this project, I will use publicly available datasets. One dataset will be used for emotion classification, which contains text and emotion labels. Another dataset will be used for training the chatbot, such as DailyDialog, which contains conversations in the form of message and reply pairs (Li et al., 2017). The data will be divided into training, validation, and test sets to properly train and evaluate the models.
-Method and Model Design: The system will be built in two stages. In the first stage, I will use a transformer model such as BERT or DistilBERT to detect the emotion of the input text. This type of model is good at understanding the meaning of sentences (Devlin et al., 2019). In the second stage, I will use another transformer-based model to generate replies. The detected emotion will be added to the input so that the reply is guided by the user’s feeling.
-Baseline Method: I will create a simple chatbot as a baseline model. This chatbot will generate replies without using any emotion information. By comparing this with the emotion-aware chatbot, I can clearly show whether adding emotion improves the responses.
-Evaluation Metrics: For emotion detection, I will use accuracy and F1-score to measure performance. For response generation, I will use a simple metric like BLEU score to check the quality of the replies (Papineni et al., 2002). I will also manually check some outputs to see if the replies make sense and match the emotion. A good result means the model performs better than the baseline and gives more suitable replies.
-Experimental Plan: First, I will train the emotion detection model and check its performance. Then, I will build the baseline chatbot without emotion input. After that, I will build the emotion-aware chatbot using sentiment conditioning. Finally, I will compare both models and study how emotion information improves the responses.
-Expected Outcome: I expect the emotion-aware chatbot to give better and more suitable replies based on the user’s feelings. It should respond differently for different emotions. The baseline model will likely give more general replies without emotional understanding.
-Failure Analysis and Limitations: There are some possible problems in this project. If the emotion detection is wrong, the chatbot may give an incorrect reply. Also, if the dataset is small or simple, the quality of responses may not be very good. I will study the cases where the model gives wrong or weak responses and try to understand the reasons.
-Ethics and Responsible Use: This chatbot should not be used for serious situations like medical or mental health advice. It may not fully understand human emotions and can sometimes give incorrect replies. It should only be used as a simple support tool and not as a replacement for human decision-making.
-Tools and Implementation: I will use Python for implementation. For building models, I will use libraries such as PyTorch or TensorFlow. I will also use the HuggingFace Transformers library for transformer models (Wolf et al., 2020). Other libraries like NumPy and scikit-learn will be used for data processing and evaluation.
-Conclusion: This project focuses on building a chatbot that understands user emotions and gives replies based on them. It combines emotion detection and response generation into one system. The main goal is to improve the quality of interaction and make chatbot responses more natural and useful.
-References
-1.	Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. Proceedings of NAACL-HLT.
-2.	Li, Y., Su, H., Shen, X., Li, W., Cao, Z., & Niu, S. (2017). DailyDialog: A manually labelled multi-turn dialogue dataset. Proceedings of IJCNLP.
-3.	Papineni, K., Roukos, S., Ward, T., & Zhu, W. J. (2002). BLEU: a method for automatic evaluation of machine translation. Proceedings of ACL.
-4.	Wolf, T., Debut, L., Sanh, V., et al. (2020). Transformers: State-of-the-art natural language processing. Proceedings of EMNLP: System Demonstrations.
+# Emotion-Aware Chatbot Using Transformer Models
 
+## Overview
+
+This project explores how a chatbot can first identify a user's emotion and then produce a more appropriate reply. The main goal is to compare a simple baseline chatbot with an emotion-aware chatbot that uses transformer-based emotion classification.
+
+## Problem Statement
+
+Many chatbots respond in a generic way without recognizing how the user feels. If a user says they are sad, stressed, or angry, a standard chatbot may still reply with the same neutral tone. This project aims to make chatbot responses more natural and helpful by adding an emotion detection stage before response generation.
+
+## Project Goal
+
+The system is designed in two stages:
+
+1. An emotion classifier predicts the emotion in a user's message.
+2. A chatbot generates a reply that is guided by the detected emotion.
+
+The expected outcome is that the emotion-aware chatbot will respond more appropriately than a baseline chatbot that does not use emotion information.
+
+## Datasets
+
+- `dair-ai/emotion` is used for emotion classification.
+- A future extension can use `DailyDialog` for response-generation experiments.
+
+## Current Implementation
+
+This repository currently includes:
+
+- `baseline_chatbot.py`: a simple baseline chatbot with general rule-based responses.
+- `emotion_chatbot.py`: an emotion-aware chatbot that detects emotion and adapts its response.
+- `emotion_nn.py`: a transformer training script for emotion classification using DistilBERT.
+
+## Method
+
+### Stage 1: Emotion Classification
+
+The project trains a transformer-based classifier using `distilbert-base-uncased` on the `dair-ai/emotion` dataset. The model predicts one of the supported emotion labels such as sadness, joy, anger, fear, love, or surprise.
+
+### Stage 2: Emotion-Aware Response
+
+The chatbot uses the predicted emotion to choose a more suitable response style. For example, a sad message should lead to a more supportive reply, while a joyful message should lead to a more positive reply.
+
+## Baseline Method
+
+The baseline chatbot does not use any emotion detection. It responds using simple general-purpose rules. This gives a comparison point for the emotion-aware version.
+
+## Evaluation Plan
+
+For emotion classification:
+
+- Accuracy
+- Weighted F1-score
+
+For chatbot quality:
+
+- Manual comparison between baseline and emotion-aware replies
+- Future extension: BLEU or other text-generation metrics if a generative response model is added
+
+## How To Run
+
+### 1. Create or activate the environment
+
+If you are using the local virtual environment already included in the project:
+
+```powershell
+.\.venv\Scripts\python.exe --version
+```
+
+### 2. Train the emotion classifier
+
+Quick local test:
+
+```powershell
+.\.venv\Scripts\python.exe emotion_nn.py --epochs 0.01 --max-train-samples 64 --max-eval-samples 32
+```
+
+Smaller default CPU-friendly run:
+
+```powershell
+.\.venv\Scripts\python.exe emotion_nn.py
+```
+
+Full training run:
+
+```powershell
+.\.venv\Scripts\python.exe emotion_nn.py --full-dataset --epochs 3
+```
+
+### 3. Run the baseline chatbot
+
+```powershell
+.\.venv\Scripts\python.exe baseline_chatbot.py
+```
+
+### 4. Run the emotion-aware chatbot
+
+```powershell
+.\.venv\Scripts\python.exe emotion_chatbot.py
+```
+
+If `saved_emotion_model` exists, the chatbot will try to use that local model first. Otherwise it falls back to a public Hugging Face emotion model for demonstration.
+
+## Example
+
+Input:
+
+```text
+I feel stressed about my project submission.
+```
+
+Possible baseline response:
+
+```text
+That sounds important. Tell me what part you want help with.
+```
+
+Possible emotion-aware response:
+
+```text
+Detected emotion: fear
+That sounds stressful. Let's take it one step at a time.
+```
+
+## Limitations
+
+- The current chatbot response system is still template-based, not a full generative dialogue model.
+- If the emotion classifier predicts the wrong label, the chatbot response may also be inappropriate.
+- This system is for educational and research purposes only.
+
+## Ethics and Responsible Use
+
+This chatbot should not be used for medical, legal, crisis, or mental health decisions. It may misread emotions and should only be treated as a simple conversational support tool.
+
+## Roadmap
+
+- Improve the emotion classifier with more tuning and evaluation
+- Add a true response-generation model
+- Compare baseline and emotion-aware outputs on a shared test set
+- Add automatic evaluation for chatbot responses
+
+## References
+
+1. Devlin, J., Chang, M. W., Lee, K., and Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. Proceedings of NAACL-HLT.
+2. Li, Y., Su, H., Shen, X., Li, W., Cao, Z., and Niu, S. (2017). DailyDialog: A manually labelled multi-turn dialogue dataset. Proceedings of IJCNLP.
+3. Papineni, K., Roukos, S., Ward, T., and Zhu, W. J. (2002). BLEU: a method for automatic evaluation of machine translation. Proceedings of ACL.
+4. Wolf, T., Debut, L., Sanh, V., et al. (2020). Transformers: State-of-the-art natural language processing. Proceedings of EMNLP: System Demonstrations.

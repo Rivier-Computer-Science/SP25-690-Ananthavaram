@@ -205,3 +205,21 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project training artifacts
+# Keep large model binaries out of normal Git, but allow small metadata files
+# so project progress can still be reviewed on GitHub.
+saved_emotion_model/*
+!saved_emotion_model/config.json
+!saved_emotion_model/tokenizer.json
+!saved_emotion_model/tokenizer_config.json
+!saved_emotion_model/training_args.bin
+
+results_emotion_model/*
+!results_emotion_model/checkpoint-1/
+results_emotion_model/checkpoint-1/*
+!results_emotion_model/checkpoint-1/config.json
+!results_emotion_model/checkpoint-1/tokenizer.json
+!results_emotion_model/checkpoint-1/tokenizer_config.json
+!results_emotion_model/checkpoint-1/trainer_state.json
+!results_emotion_model/checkpoint-1/training_args.bin
