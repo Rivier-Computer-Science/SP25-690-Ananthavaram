@@ -1,3 +1,26 @@
+# 04/19/2026 11:44 Multi-Model Validation Results
+
+* **Quick Multi-Model Benchmark Executed**: Ran the updated comparison workflow in quick mode across `local`, `hartmann`, `bhadresh`, and `go_emotions` to validate the new multi-model evaluation path from the terminal.
+* **Model Ranking Observed**: The quick benchmark showed `hartmann` as the strongest performer on the checked prompts, with `local` and `go_emotions` landing in the middle and `bhadresh` performing poorly on the same examples.
+* **Cached Model Behavior Confirmed**: Verified that the first comparison run takes longer because remote Hugging Face models download during initial use, while later runs should be faster once the models are cached locally.
+
+# 04/19/2026 11:00 Multi-Model Emotion Comparison
+
+* **Multiple Emotion Models Added**: Extended `emotion_chatbot.py` so the project can load several classifier sources, including the local fine-tuned model and additional Hugging Face emotion models, while normalizing their labels into the shared project emotion set.
+* **Comparison Workflow Expanded**: Refactored `compare_chatbots.py` to evaluate multiple emotion models in one run, print per-model progress in the terminal, and write both `comparison_results.csv` and `model_comparison_summary.csv`.
+* **Model Selection Support Added**: Added a `--models` option to the comparison script so targeted model subsets can be tested quickly during iteration.
+
+# 04/19/2026 10:51 Quick Comparison Mode
+
+* **Fast Terminal Feedback Added**: Updated `compare_chatbots.py` with a `--quick` flag that evaluates only the first 3 prompts so the comparison workflow feels much faster during repeat terminal checks.
+* **README Quick Command Added**: Documented the new quick comparison command in `README.md` to make the lightweight evaluation path easier to use.
+
+# 04/19/2026 10:36 Shared Chatbot Evaluation Workflow
+
+* **Shared Prompt Comparison Added**: Created `compare_chatbots.py` to run the baseline and emotion-aware chatbots on the same evaluation prompts and export a structured CSV report for side-by-side review.
+* **Reusable Evaluation Prompt Set**: Added `evaluation_prompts.json` with representative prompts covering sadness, joy, anger, fear, love, surprise, and project-related stress so comparisons are repeatable across runs.
+* **README Evaluation Instructions Updated**: Extended `README.md` with the new comparison command and documented the generated `comparison_results.csv` output as part of the project workflow.
+
 # 04/19/2026 10:31 Work Dashboard & Environment Refresh
 
 * **Work Dashboard Added**: Created `dashboard.py` as a lightweight Streamlit-based workspace dashboard that lists project files, supports manual refresh, adds optional auto-refresh timing, and provides inline previews for common text files to make the work area easier to monitor.

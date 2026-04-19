@@ -1,0 +1,5 @@
+model,model_source,status,matched_labeled_prompts,labeled_prompts,match_rate,elapsed_seconds,error
+local,saved_emotion_model,ok,2,3,0.6667,0.52,
+hartmann,j-hartmann/emotion-english-distilroberta-base,ok,3,3,1.0000,0.17,
+bhadresh,bhadresh-savani/distilbert-base-uncased-emotion,ok,0,3,0.0000,0.15,
+go_emotions,SamLowe/roberta-base-go_emotions,ok,2,3,0.6667,0.28,

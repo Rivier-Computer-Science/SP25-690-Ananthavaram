@@ -29,6 +29,7 @@ This repository currently includes:
 - `baseline_chatbot.py`: a simple baseline chatbot with general rule-based responses.
 - `emotion_chatbot.py`: an emotion-aware chatbot that detects emotion and adapts its response.
 - `emotion_nn.py`: a transformer training script for emotion classification using DistilBERT.
+- `compare_chatbots.py`: a shared evaluation script that compares the baseline chatbot plus multiple emotion-classifier models on the same prompts and writes CSV reports.
 
 ## Method
 
@@ -54,6 +55,7 @@ For emotion classification:
 For chatbot quality:
 
 - Manual comparison between baseline and emotion-aware replies
+- Shared prompt evaluation using `compare_chatbots.py`
 - Future extension: BLEU or other text-generation metrics if a generative response model is added
 
 ## How To Run
@@ -107,6 +109,26 @@ If `saved_emotion_model` exists, the chatbot will try to use that local model fi
 ```
 
 The dashboard shows the current project files, supports manual refresh, and can auto-refresh on a timer so you can keep an eye on the workspace while you work.
+
+### 6. Compare chatbot outputs on a shared test set
+
+```powershell
+.\.venv\Scripts\python.exe compare_chatbots.py
+```
+
+This runs the baseline chatbot plus all configured emotion models against the shared prompts in `evaluation_prompts.json` and writes detailed results to `comparison_results.csv` and per-model scores to `model_comparison_summary.csv`.
+
+For a faster terminal check with only the first 3 prompts:
+
+```powershell
+.\.venv\Scripts\python.exe compare_chatbots.py --quick
+```
+
+To compare only specific models:
+
+```powershell
+.\.venv\Scripts\python.exe compare_chatbots.py --quick --models local hartmann bhadresh
+```
 
 ## Example
 

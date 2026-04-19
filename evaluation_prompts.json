@@ -1,0 +1,42 @@
+[
+  {
+    "id": "sad_1",
+    "text": "I feel really down today and I do not know how to get motivated.",
+    "expected_emotion": "sadness"
+  },
+  {
+    "id": "joy_1",
+    "text": "I just found out I got the internship I wanted.",
+    "expected_emotion": "joy"
+  },
+  {
+    "id": "anger_1",
+    "text": "I am upset because my teammate ignored all my messages.",
+    "expected_emotion": "anger"
+  },
+  {
+    "id": "fear_1",
+    "text": "I am nervous about presenting in front of the whole class tomorrow.",
+    "expected_emotion": "fear"
+  },
+  {
+    "id": "love_1",
+    "text": "I am so grateful for how supportive my family has been lately.",
+    "expected_emotion": "love"
+  },
+  {
+    "id": "surprise_1",
+    "text": "I did not expect my professor to move the deadline back by a week.",
+    "expected_emotion": "surprise"
+  },
+  {
+    "id": "question_1",
+    "text": "How can I organize my study schedule better?",
+    "expected_emotion": "neutral"
+  },
+  {
+    "id": "project_1",
+    "text": "My project is due soon and I am stressed about finishing everything.",
+    "expected_emotion": "fear"
+  }
+]

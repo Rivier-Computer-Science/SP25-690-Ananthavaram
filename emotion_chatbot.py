@@ -5,6 +5,12 @@ from transformers import pipeline
 
 DEFAULT_REMOTE_MODEL = "j-hartmann/emotion-english-distilroberta-base"
 LOCAL_MODEL_PATH = Path("saved_emotion_model")
+MODEL_SOURCES = {
+    "local": str(LOCAL_MODEL_PATH),
+    "hartmann": "j-hartmann/emotion-english-distilroberta-base",
+    "bhadresh": "bhadresh-savani/distilbert-base-uncased-emotion",
+    "go_emotions": "SamLowe/roberta-base-go_emotions",
+}
 LOCAL_LABEL_MAP = {
     "label_0": "sadness",
     "label_1": "joy",
@@ -23,14 +29,66 @@ EMOTION_RESPONSES = {
     "surprise": "That sounds unexpected. What happened next?",
     "neutral": "I hear you. Tell me a little more.",
 }
+CANONICAL_EMOTION_MAP = {
+    "admiration": "love",
+    "amusement": "joy",
+    "anger": "anger",
+    "annoyance": "anger",
+    "approval": "joy",
+    "caring": "love",
+    "confusion": "surprise",
+    "curiosity": "surprise",
+    "desire": "love",
+    "disappointment": "sadness",
+    "disapproval": "anger",
+    "disgust": "anger",
+    "embarrassment": "fear",
+    "excitement": "joy",
+    "fear": "fear",
+    "gratitude": "love",
+    "grief": "sadness",
+    "joy": "joy",
+    "love": "love",
+    "nervousness": "fear",
+    "optimism": "joy",
+    "pride": "joy",
+    "realization": "surprise",
+    "relief": "joy",
+    "remorse": "sadness",
+    "sadness": "sadness",
+    "surprise": "surprise",
+    "neutral": "neutral",
+}
 
 
-def load_emotion_pipeline():
+def get_available_model_sources():
+    available_models = dict(MODEL_SOURCES)
+    if not LOCAL_MODEL_PATH.exists():
+        available_models.pop("local", None)
+    return available_models
+
+
+def resolve_model_source(model_name=None):
+    available_models = get_available_model_sources()
+    if model_name:
+        return available_models.get(model_name, model_name)
+    if "local" in available_models:
+        return available_models["local"]
+    return DEFAULT_REMOTE_MODEL
+
+
+def normalize_emotion_label(raw_label):
+    normalized = raw_label.lower().strip()
+    normalized = LOCAL_LABEL_MAP.get(normalized, normalized)
+    return CANONICAL_EMOTION_MAP.get(normalized, normalized)
+
+
+def load_emotion_pipeline(model_name=None):
     """
     Prefer a locally trained model if it exists. Otherwise fall back to a
     public emotion classification model for demonstration purposes.
     """
-    model_source = str(LOCAL_MODEL_PATH) if LOCAL_MODEL_PATH.exists() else DEFAULT_REMOTE_MODEL
+    model_source = resolve_model_source(model_name=model_name)
     return pipeline("text-classification", model=model_source, tokenizer=model_source)
 
 
@@ -38,23 +96,24 @@ def detect_emotion(user_input, classifier=None):
     classifier = classifier or load_emotion_pipeline()
     prediction = classifier(user_input)[0]
     raw_label = prediction["label"].lower()
-    emotion = LOCAL_LABEL_MAP.get(raw_label, raw_label)
-    return emotion, float(prediction["score"])
+    emotion = normalize_emotion_label(raw_label)
+    return emotion, float(prediction["score"]), raw_label
 
 
 def emotion_chatbot(user_input, classifier=None):
     if not user_input.strip():
         return {
             "emotion": "neutral",
+            "raw_label": "neutral",
             "score": 1.0,
             "response": "Please type a message so I can respond.",
         }
 
-    emotion, score = detect_emotion(user_input, classifier=classifier)
+    emotion, score, raw_label = detect_emotion(user_input, classifier=classifier)
     response = EMOTION_RESPONSES.get(
         emotion, "Thanks for sharing that. Tell me a little more so I can understand better."
     )
-    return {"emotion": emotion, "score": score, "response": response}
+    return {"emotion": emotion, "raw_label": raw_label, "score": score, "response": response}
 
 
 def run_chat():
@@ -75,7 +134,10 @@ def run_chat():
             break
 
         result = emotion_chatbot(user_input, classifier=classifier)
-        print(f"Detected emotion: {result['emotion']} ({result['score']:.2f})")
+        print(
+            f"Detected emotion: {result['emotion']} "
+            f"(raw={result['raw_label']}, score={result['score']:.2f})"
+        )
         print("Bot:", result["response"])
 
 
