@@ -1,3 +1,14 @@
+# 04/19/2026 11:56 Mathematical Model Comparison
+
+* **Numeric Evaluation Metrics Added**: Extended `compare_chatbots.py` to compute mathematical comparison metrics for each model, including accuracy, weighted precision, weighted recall, weighted F1, and macro F1 on the labeled prompts.
+* **Metrics CSV Export Added**: Added `model_metric_comparison.csv` as a dedicated numeric summary output so model quality can be compared quantitatively outside the terminal as well.
+* **README Metrics Note Added**: Updated `README.md` so the comparison workflow now documents the new mathematical evaluation outputs alongside the existing detailed and summary CSV reports.
+
+# 04/19/2026 11:49 Full Terminal Result Printing
+
+* **Complete Result Output Added**: Updated `compare_chatbots.py` with a `--print-all` option so every comparison row can be printed in the terminal instead of showing only the short sample section.
+* **README Command Example Added**: Documented a `--print-all` usage example in `README.md` for quick terminal-based review of the full comparison output.
+
 # 04/19/2026 11:44 Multi-Model Validation Results
 
 * **Quick Multi-Model Benchmark Executed**: Ran the updated comparison workflow in quick mode across `local`, `hartmann`, `bhadresh`, and `go_emotions` to validate the new multi-model evaluation path from the terminal.

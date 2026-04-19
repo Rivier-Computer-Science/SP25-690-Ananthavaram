@@ -117,6 +117,7 @@ The dashboard shows the current project files, supports manual refresh, and can 
 ```
 
 This runs the baseline chatbot plus all configured emotion models against the shared prompts in `evaluation_prompts.json` and writes detailed results to `comparison_results.csv` and per-model scores to `model_comparison_summary.csv`.
+It also writes mathematical metrics such as accuracy, weighted precision, weighted recall, weighted F1, and macro F1 to `model_metric_comparison.csv`.
 
 For a faster terminal check with only the first 3 prompts:
 
@@ -128,6 +129,12 @@ To compare only specific models:
 
 ```powershell
 .\.venv\Scripts\python.exe compare_chatbots.py --quick --models local hartmann bhadresh
+```
+
+To print every comparison result in the terminal:
+
+```powershell
+.\.venv\Scripts\python.exe compare_chatbots.py --quick --models local hartmann --print-all
 ```
 
 ## Example

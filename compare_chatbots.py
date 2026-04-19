@@ -4,6 +4,8 @@ import json
 import time
 from pathlib import Path
 
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
 from baseline_chatbot import baseline_chatbot
 from emotion_chatbot import emotion_chatbot, get_available_model_sources, load_emotion_pipeline
 
@@ -11,6 +13,7 @@ from emotion_chatbot import emotion_chatbot, get_available_model_sources, load_e
 DEFAULT_PROMPTS_PATH = Path("evaluation_prompts.json")
 DEFAULT_OUTPUT_PATH = Path("comparison_results.csv")
 DEFAULT_SUMMARY_PATH = Path("model_comparison_summary.csv")
+DEFAULT_METRICS_PATH = Path("model_metric_comparison.csv")
 
 
 def parse_args():
@@ -36,6 +39,12 @@ def parse_args():
         help="CSV file where the per-model summary will be written.",
     )
     parser.add_argument(
+        "--metrics-file",
+        type=Path,
+        default=DEFAULT_METRICS_PATH,
+        help="CSV file where the mathematical model metrics will be written.",
+    )
+    parser.add_argument(
         "--quick",
         action="store_true",
         help="Run a smaller 3-prompt comparison for faster terminal feedback.",
@@ -45,6 +54,11 @@ def parse_args():
         nargs="+",
         default=None,
         help="Model aliases to compare. Defaults to all configured models.",
+    )
+    parser.add_argument(
+        "--print-all",
+        action="store_true",
+        help="Print every comparison result to the terminal instead of only a short sample.",
     )
     return parser.parse_args()
 
@@ -73,10 +87,39 @@ def write_csv(path: Path, rows):
         writer.writerows(rows)
 
 
-def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path):
+def calculate_model_metrics(model_rows):
+    labeled_rows = [row for row in model_rows if isinstance(row["emotion_match"], bool)]
+    if not labeled_rows:
+        return {
+            "matched_labeled_prompts": 0,
+            "labeled_prompts": 0,
+            "accuracy": "",
+            "precision_weighted": "",
+            "recall_weighted": "",
+            "f1_weighted": "",
+            "f1_macro": "",
+        }
+
+    expected = [row["expected_emotion"] for row in labeled_rows]
+    predicted = [row["predicted_emotion"] for row in labeled_rows]
+    correct = sum(1 for row in labeled_rows if row["emotion_match"])
+    total = len(labeled_rows)
+    return {
+        "matched_labeled_prompts": correct,
+        "labeled_prompts": total,
+        "accuracy": f"{accuracy_score(expected, predicted):.4f}",
+        "precision_weighted": f"{precision_score(expected, predicted, average='weighted', zero_division=0):.4f}",
+        "recall_weighted": f"{recall_score(expected, predicted, average='weighted', zero_division=0):.4f}",
+        "f1_weighted": f"{f1_score(expected, predicted, average='weighted', zero_division=0):.4f}",
+        "f1_macro": f"{f1_score(expected, predicted, average='macro', zero_division=0):.4f}",
+    }
+
+
+def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path, metrics_path: Path):
     start_time = time.time()
     rows = []
     summary_rows = []
+    metric_rows = []
     baseline_cache = {}
 
     for model_name, model_source in model_specs:
@@ -93,6 +136,11 @@ def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path):
                     "matched_labeled_prompts": "",
                     "labeled_prompts": "",
                     "match_rate": "",
+                    "accuracy": "",
+                    "precision_weighted": "",
+                    "recall_weighted": "",
+                    "f1_weighted": "",
+                    "f1_macro": "",
                     "elapsed_seconds": "",
                     "error": str(exc),
                 }
@@ -140,36 +188,69 @@ def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path):
             )
             print("  Comparison recorded.\n")
 
-        labeled_rows = [row for row in model_rows if isinstance(row["emotion_match"], bool)]
-        correct = sum(1 for row in labeled_rows if row["emotion_match"])
-        total = len(labeled_rows)
+        metrics = calculate_model_metrics(model_rows)
         model_elapsed = time.time() - model_start_time
         summary_rows.append(
             {
                 "model": model_name,
                 "model_source": model_source,
                 "status": "ok",
-                "matched_labeled_prompts": correct,
-                "labeled_prompts": total,
-                "match_rate": f"{(correct / total):.4f}" if total else "",
+                "matched_labeled_prompts": metrics["matched_labeled_prompts"],
+                "labeled_prompts": metrics["labeled_prompts"],
+                "match_rate": (
+                    f"{(metrics['matched_labeled_prompts'] / metrics['labeled_prompts']):.4f}"
+                    if metrics["labeled_prompts"]
+                    else ""
+                ),
+                "accuracy": metrics["accuracy"],
+                "precision_weighted": metrics["precision_weighted"],
+                "recall_weighted": metrics["recall_weighted"],
+                "f1_weighted": metrics["f1_weighted"],
+                "f1_macro": metrics["f1_macro"],
                 "elapsed_seconds": f"{model_elapsed:.2f}",
                 "error": "",
             }
         )
+        metric_rows.append(
+            {
+                "model": model_name,
+                "model_source": model_source,
+                "accuracy": metrics["accuracy"],
+                "precision_weighted": metrics["precision_weighted"],
+                "recall_weighted": metrics["recall_weighted"],
+                "f1_weighted": metrics["f1_weighted"],
+                "f1_macro": metrics["f1_macro"],
+                "matched_labeled_prompts": metrics["matched_labeled_prompts"],
+                "labeled_prompts": metrics["labeled_prompts"],
+                "elapsed_seconds": f"{model_elapsed:.2f}",
+            }
+        )
         print(
             f"Finished model '{model_name}': "
-            f"{correct}/{total} labeled prompts matched in {model_elapsed:.2f} seconds.\n"
+            f"{metrics['matched_labeled_prompts']}/{metrics['labeled_prompts']} labeled prompts matched "
+            f"in {model_elapsed:.2f} seconds.\n"
         )
 
     write_csv(output_path, rows)
     write_csv(summary_path, summary_rows)
+    write_csv(metrics_path, metric_rows)
     elapsed = time.time() - start_time
-    return rows, summary_rows, elapsed
+    return rows, summary_rows, metric_rows, elapsed
 
 
-def print_summary(rows, summary_rows, output_path: Path, summary_path: Path, elapsed: float):
+def print_summary(
+    rows,
+    summary_rows,
+    metric_rows,
+    output_path: Path,
+    summary_path: Path,
+    metrics_path: Path,
+    elapsed: float,
+    print_all: bool,
+):
     print(f"Wrote comparison report to: {output_path}")
     print(f"Wrote model summary to: {summary_path}")
+    print(f"Wrote mathematical metrics to: {metrics_path}")
     print(f"Comparison rows written: {len(rows)}")
     print(f"Elapsed time: {elapsed:.2f} seconds")
 
@@ -184,8 +265,21 @@ def print_summary(rows, summary_rows, output_path: Path, summary_path: Path, ela
             f"labeled prompts matched"
         )
 
-    print("\nSample results:")
-    for row in rows[:3]:
+    print("\nMathematical comparison:")
+    for row in metric_rows:
+        print(
+            f"- {row['model']}: "
+            f"accuracy={row['accuracy']}, "
+            f"precision_w={row['precision_weighted']}, "
+            f"recall_w={row['recall_weighted']}, "
+            f"f1_w={row['f1_weighted']}, "
+            f"f1_macro={row['f1_macro']}"
+        )
+
+    results_to_print = rows if print_all else rows[:3]
+    heading = "All results:" if print_all else "Sample results:"
+    print(f"\n{heading}")
+    for row in results_to_print:
         print(f"- {row['model']} / {row['id'] or '[no id]'}")
         print(f"  User: {row['text']}")
         print(f"  Baseline: {row['baseline_response']}")
@@ -204,13 +298,23 @@ def main():
         print("Quick mode enabled: using the first 3 prompts.\n")
     model_specs = resolve_requested_models(args.models)
     print(f"Comparing models: {', '.join(model_name for model_name, _ in model_specs)}\n")
-    rows, summary_rows, elapsed = run_comparison(
+    rows, summary_rows, metric_rows, elapsed = run_comparison(
         prompts,
         model_specs,
         args.output_file,
         args.summary_file,
+        args.metrics_file,
     )
-    print_summary(rows, summary_rows, args.output_file, args.summary_file, elapsed)
+    print_summary(
+        rows,
+        summary_rows,
+        metric_rows,
+        args.output_file,
+        args.summary_file,
+        args.metrics_file,
+        elapsed,
+        args.print_all,
+    )
 
 
 if __name__ == "__main__":
