@@ -117,7 +117,7 @@ The dashboard shows the current project files, supports manual refresh, and can 
 ```
 
 This runs the baseline chatbot plus all configured emotion models against the shared prompts in `evaluation_prompts.json` and writes detailed results to `comparison_results.csv` and per-model scores to `model_comparison_summary.csv`.
-It also writes mathematical metrics such as accuracy, weighted precision, weighted recall, weighted F1, and macro F1 to `model_metric_comparison.csv`.
+It also writes mathematical metrics such as accuracy, weighted precision, weighted recall, weighted F1, and macro F1 to `model_metric_comparison.csv`, ranked from best to worst.
 
 For a faster terminal check with only the first 3 prompts:
 

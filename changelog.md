@@ -1,3 +1,8 @@
+# 04/19/2026 12:02 Ranked Model Metrics
+
+* **Automatic Model Ranking Added**: Updated `compare_chatbots.py` so mathematical comparison results are now ranked from best to worst using weighted F1 as the primary ordering metric, with additional metric ties broken by accuracy, precision, and recall.
+* **Ranked Metrics Export Added**: The generated `model_metric_comparison.csv` now includes an explicit `rank` column so the strongest-performing model is easier to identify after each comparison run.
+
 # 04/19/2026 11:56 Mathematical Model Comparison
 
 * **Numeric Evaluation Metrics Added**: Extended `compare_chatbots.py` to compute mathematical comparison metrics for each model, including accuracy, weighted precision, weighted recall, weighted F1, and macro F1 on the labeled prompts.

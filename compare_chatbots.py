@@ -115,6 +115,25 @@ def calculate_model_metrics(model_rows):
     }
 
 
+def rank_metric_rows(metric_rows):
+    ranked_rows = sorted(
+        metric_rows,
+        key=lambda row: (
+            float(row["f1_weighted"]),
+            float(row["accuracy"]),
+            float(row["precision_weighted"]),
+            float(row["recall_weighted"]),
+        ),
+        reverse=True,
+    )
+    ranked_output = []
+    for index, row in enumerate(ranked_rows, start=1):
+        ranked_row = dict(row)
+        ranked_row["rank"] = index
+        ranked_output.append(ranked_row)
+    return ranked_output
+
+
 def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path, metrics_path: Path):
     start_time = time.time()
     rows = []
@@ -231,11 +250,12 @@ def run_comparison(prompts, model_specs, output_path: Path, summary_path: Path, 
             f"in {model_elapsed:.2f} seconds.\n"
         )
 
+    ranked_metric_rows = rank_metric_rows(metric_rows)
     write_csv(output_path, rows)
     write_csv(summary_path, summary_rows)
-    write_csv(metrics_path, metric_rows)
+    write_csv(metrics_path, ranked_metric_rows)
     elapsed = time.time() - start_time
-    return rows, summary_rows, metric_rows, elapsed
+    return rows, summary_rows, ranked_metric_rows, elapsed
 
 
 def print_summary(
@@ -268,7 +288,7 @@ def print_summary(
     print("\nMathematical comparison:")
     for row in metric_rows:
         print(
-            f"- {row['model']}: "
+            f"- #{row['rank']} {row['model']}: "
             f"accuracy={row['accuracy']}, "
             f"precision_w={row['precision_weighted']}, "
             f"recall_w={row['recall_weighted']}, "
