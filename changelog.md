@@ -1,3 +1,10 @@
+# 04/19/2026 10:31 Work Dashboard & Environment Refresh
+
+* **Work Dashboard Added**: Created `dashboard.py` as a lightweight Streamlit-based workspace dashboard that lists project files, supports manual refresh, adds optional auto-refresh timing, and provides inline previews for common text files to make the work area easier to monitor.
+* **Dashboard Dependency Setup**: Extended `pyproject.toml` to include `streamlit` and refreshed the environment so the dashboard can run inside the existing `.venv` without changing the chatbot training code.
+* **README Run Instructions Updated**: Added a new dashboard usage section to `README.md` documenting the exact `streamlit` launch command for the new work dashboard.
+* **Virtual Environment Repair During Sync**: Resolved a Windows/OneDrive permission issue in `.venv` caused by stale package metadata so `uv sync` could finish installing the new dashboard dependencies cleanly.
+
 # 04/19/2026 08:52 Dependency Resolution & Trainer API Patch
 
 * **Accelerate Dependency Sync**: Resolved an upstream PyTorch backend `ImportError` by directly declaring `accelerate` within `pyproject.toml` dependencies, which is natively required by Hugging Face's latest internal pipelines.

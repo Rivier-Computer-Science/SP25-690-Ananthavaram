@@ -100,6 +100,14 @@ Full training run:
 
 If `saved_emotion_model` exists, the chatbot will try to use that local model first. Otherwise it falls back to a public Hugging Face emotion model for demonstration.
 
+### 5. Run the work dashboard
+
+```powershell
+.\.venv\Scripts\streamlit.exe run dashboard.py
+```
+
+The dashboard shows the current project files, supports manual refresh, and can auto-refresh on a timer so you can keep an eye on the workspace while you work.
+
 ## Example
 
 Input:
